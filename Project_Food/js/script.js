@@ -1,10 +1,11 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
     // Tabs
-    const tabs = document.querySelectorAll(".tabheader__item");
-    const tabsContent = document.querySelectorAll(".tabcontent");
-    const tabsParent = document.querySelector(".tabheader__items");
+
+    let tabs = document.querySelectorAll(".tabheader__item"),
+        tabsContent = document.querySelectorAll(".tabcontent"),
+        tabsParent = document.querySelector(".tabheader__items");
 
     function hideTabContent() {
         tabsContent.forEach((item) => {
@@ -12,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
             item.classList.remove("show", "fade");
         });
 
-        tabs.forEach((tab) => {
-            tab.classList.remove("tabheader__item_active");
+        tabs.forEach((item) => {
+            item.classList.remove("tabheader__item_active");
         });
     }
 
@@ -26,9 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
     hideTabContent();
     showTabContent();
 
-    tabsParent.addEventListener("click", (e) => {
-        const target = e.target;
-
+    tabsParent.addEventListener("click", function (event) {
+        const target = event.target;
         if (target && target.classList.contains("tabheader__item")) {
             tabs.forEach((item, i) => {
                 if (target == item) {
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    /* const modalTimerId = setTimeout(openModal, 5000); */
+    const modalTimerId = setTimeout(openModal, 5000);
 
     function showModalByScroll() {
         if (
@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         render() {
             const element = document.createElement("div");
+
             if (this.classes.length === 0) {
                 this.element = "menu__item";
                 element.classList.add(this.element);
@@ -217,4 +218,63 @@ document.addEventListener("DOMContentLoaded", () => {
         ".menu .container",
         "menu__item"
     ).render();
+
+    // Forms
+
+    const forms = document.querySelectorAll("form");
+
+    const message = {
+        loading: "Загрузка...",
+        success: "Спасибо! Скоро мы с вами свяжемся",
+        failure: "Что-то пошло не так...",
+    };
+
+    forms.forEach((item) => {
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            //создание блока и вывод сообщения, что все успешно
+            let statusMessage = document.createElement("div");
+            statusMessage.classList.add("status");
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+            ////
+
+            const request = new XMLHttpRequest();
+            request.open("POST", "server.php");
+
+            request.setRequestHeader("Content-type", "application/json");
+
+            const formData = new FormData(form);
+
+            //////// 2 СПОСОБ
+            // Отправка данных на сервер в формате JSON, formData сразу нельзя преобразовать в JSON, необходимо его скопировать в другой объект
+            const object = {}; // получение объекта formData
+            formData.forEach(function (value, key) {
+                object[key] = value;
+            });
+
+            const json = JSON.stringify(object); // конвертация в JSON
+
+            request.send(json);
+            //////
+
+            request.addEventListener("load", () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    statusMessage.textContent = message.success;
+                    form.reset(); //очистка формы
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+            });
+        });
+    }
 });
