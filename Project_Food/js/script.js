@@ -299,4 +299,18 @@ window.addEventListener("DOMContentLoaded", () => {
             closeModal();
         }, 4000);
     }
+
+    // fetch на GET
+    // fetch("https://jsonplaceholder.typicode.com/todos/1") // делаем запрос к первой todos
+    //     .then((response) => response.json())
+    //     .then((json) => console.log(json));
+
+    // fetch на POST
+    // fetch("https://jsonplaceholder.typicode.com/posts", {
+    //     method: "POST",
+    //     body: JSON.stringify({ name: "Alex" }),
+    //     headers: { "Content-type": "application/json" },
+    // }) // делаем запрос к первой todos
+    //     .then((response) => response.json())
+    //     .then((json) => console.log(json));
 });
